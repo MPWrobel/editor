@@ -1,0 +1,42 @@
+body {
+    font-family: Arial;
+    background-color: #111;
+}
+
+#editor-side {
+    position: fixed;
+    top:0;
+    right:0;
+    height:100%;
+    width:250px;
+    color: #ccc;
+    background: #222;
+    overflow-y: scroll;
+}
+
+#editor-side .header{
+    font-size: 24px;
+    font-weight: bold;
+    padding: 0 6px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #444;
+}
+
+#editor-side ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#editor-side li{
+    padding: 5px;
+    transition: .3s;
+    background-color: #444;
+    border-bottom: 1px solid #333;
+}
+
+#editor-side li:hover{
+    color: #fff;
+    cursor: pointer;
+    background-color: #151515;
+}
