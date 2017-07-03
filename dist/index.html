@@ -11,12 +11,14 @@
 <body>
     <div id="content"></div>
     <div id="editor-side">
-            <div class="header">Objects</div>
-            <ul>
-                <li onclick="addElement('player')">Player</li>
-                <li onclick="addElement('coin')">Coin</li>
-            </ul>
-        </div>
+        <div class="header">Objects</div>
+        <ul>
+            <li onclick="addElement('player')">Player</li>
+            <li onclick="addElement('coin')">Coin</li>
+        </ul>
+        <input type="file" id="file-input" accept=".json" onchange="loadFile()">
+        <div id="save"></div>
+    </div>
 </body>
 
 </html>

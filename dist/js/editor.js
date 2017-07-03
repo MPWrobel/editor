@@ -1,32 +1,57 @@
-var game = new Phaser.Game(1680, 1050, Phaser.AUTO, 'content', {
-    preload: preload,
-    create: create,
-    update: update
-});
+var game;
+var mapJSON;
+var output;
+function loadFile() {
+    var fileIn = document.getElementById("file-input");
+    var fileOut = document.getElementById("save");
+    var reader = new FileReader();
+    reader.readAsText(fileIn.files[0]);
+    reader.onload = function () {
+        mapJSON = reader.result;
+        output = "data:application/json;base64," + btoa(mapJSON);
+        fileOut.innerHTML = '<a href="' + output + '" download>Save</a>';
+        if (game != null)
+            game.destroy();
+        game = new Phaser.Game(window.innerWidth - 280, innerHeight - 20, Phaser.AUTO, 'content', {
+            preload: preload,
+            create: create,
+            update: update
+        }, null, false);
+    };
+}
+var esc;
 var object;
 var map;
+var grid;
 function preload() {
-    game.load.tilemap('map', '../map/map.json?' + new Date().getTime(), null, Phaser.Tilemap.TILED_JSON);
+    game.load.tilemap('map', null, JSON.parse(mapJSON), Phaser.Tilemap.TILED_JSON);
     game.load.image('tileset', '../assets/tileset.png');
+    game.load.image('player', '../assets/player.png');
     game.load.image('coin', '../assets/coin.png');
+    esc = game.input.keyboard.addKey(Phaser.Keyboard.ESC);
+    game.input.onDown.add(function () {
+        if (game.input.activePointer.leftButton.isDown) {
+            if (object != null)
+                game.add.image(object.x, object.y, object.key);
+        }
+    });
 }
 function create() {
-    game.input.onDown.add(function () {
-        if (game.input.activePointer.leftButton.isDown)
-            console.log(game.input.activePointer.x +
-                ', ' + game.input.activePointer.y);
-    });
-    game.input.keyboard.addCallbacks(null, null, function () {
-        if (game.input.keyboard.isDown(Phaser.Keyboard.ESC))
-            console.log('hello world');
-    }, null);
     map = game.add.tilemap('map');
     map.addTilesetImage('tileset', 'tileset');
     game.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     map.createLayer('layer1');
     map.createLayer('clouds');
+    //new Grid(game, map.widthInPixels, map.heightInPixels);
 }
 function update() {
+    if (esc.justDown) {
+        if (object != null) {
+            object.destroy();
+            object = null;
+        }
+        document.getElementById('content').style.cursor = 'auto';
+    }
     if (object != null) {
         object.x = game.camera.x + game.input.x;
         object.y = game.camera.y + game.input.y;
@@ -49,9 +74,9 @@ function update() {
     }
 }
 function addElement(obj) {
-    document.getElementById('content').style.cursor = 'none';
     if (object != null)
         object.destroy();
     object = game.add.sprite(game.input.activePointer.x, game.input.activePointer.y, obj);
+    document.getElementById('content').style.cursor = 'none';
 }
 //# sourceMappingURL=editor.js.map

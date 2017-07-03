@@ -40,3 +40,14 @@ body {
     cursor: pointer;
     background-color: #151515;
 }
+
+#editor-side #save{
+    padding: 5px;
+    transition: .3s;
+    background-color: #444;
+    border-bottom: 1px solid #333;
+}
+
+#editor-side #save a{
+    color: #fff;
+}
