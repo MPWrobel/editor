@@ -1,24 +1,40 @@
 let game;
 let mapJSON;
+let obj;
 let output;
+let sprites = [];
+let layers= [];
+let playerIndex;
+let player
+const fileOut = document.getElementById("save") as HTMLDivElement
 
 function loadFile() {
-    
+
     const fileIn = document.getElementById("file-input") as HTMLInputElement
-    let fileOut = document.getElementById("save")
 
     let reader = new FileReader();
+    if(fileIn.files[0]!=null)
     reader.readAsText(fileIn.files[0]);
     reader.onload = () => {
 
-        mapJSON = reader.result;
-        
-        output = "data:application/json;base64," + btoa(mapJSON);
-        fileOut.innerHTML = '<a href="'+output+'" download>Save</a>';
+        mapJSON = JSON.parse(reader.result);
 
-        if(game!=null)
+        if (mapJSON.objects == null)
+            mapJSON.objects = {};
+
+        obj = mapJSON.objects;
+
+        if (obj.player == null)
+            obj.player = {};
+        if (obj.coins == null)
+            obj.coins = [];
+
+        output = "data:application/json;base64," + btoa(JSON.stringify(mapJSON));
+        fileOut.innerHTML = '<a href="' + output + '" download>Save</a>';
+
+        if (game != null)
             game.destroy();
-        game = new Phaser.Game(window.innerWidth - 280, innerHeight - 20, Phaser.AUTO, 'content', {
+        game = new Phaser.Game(window.innerWidth - 290, innerHeight - 20, Phaser.AUTO, 'content', {
             preload: preload,
             create: create,
             update: update
@@ -27,16 +43,32 @@ function loadFile() {
     }
 }
 
-
-
 let esc;
 let object;
 let map;
 let grid;
 
+window.onresize = (e) => {
+
+    if (game != null) {
+
+        game.scale.setGameSize(window.innerWidth - 290, innerHeight - 20);
+        layers[0].destroy();
+        layers[1].destroy();
+        layers[0] = map.createLayer('layer1');
+        layers[1] = map.createLayer('clouds');
+
+
+
+    }
+
+}
+
 function preload() {
 
-    game.load.tilemap('map', null, JSON.parse(mapJSON), Phaser.Tilemap.TILED_JSON);
+    //game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
+
+    game.load.tilemap('map', null, mapJSON, Phaser.Tilemap.TILED_JSON);
     game.load.image('tileset', '../assets/tileset.png');
     game.load.image('player', '../assets/player.png')
     game.load.image('coin', '../assets/coin.png')
@@ -47,8 +79,37 @@ function preload() {
 
         if (game.input.activePointer.leftButton.isDown) {
 
-            if (object != null)
-                game.add.image(object.x, object.y, object.key);
+            if (object != null) {
+
+                sprites.push(game.add.image(object.x, object.y, object.key));
+
+                if (object.key == 'player') {
+
+                    if (sprites[playerIndex] != null) {
+
+                        sprites[playerIndex].destroy();
+                        sprites[playerIndex] = null;
+
+                    }
+
+                    playerIndex = sprites.length - 1;
+                    obj.player.x = object.x;
+                    obj.player.y = object.y
+
+                } else if (object.key == 'coin') {
+
+                    obj.coins.push({
+                        x: object.x,
+                        y: object.y
+                    });
+
+                }
+
+                output = "data:application/json;base64," + btoa(JSON.stringify(mapJSON));
+                fileOut.innerHTML = '<a href="' + output + '" download>Save</a>';
+
+            }
+
 
 
         }
@@ -63,10 +124,21 @@ function create() {
     map.addTilesetImage('tileset', 'tileset');
     game.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
-    map.createLayer('layer1');
-    map.createLayer('clouds');
+    layers.push(map.createLayer('layer1'));
+    layers.push(map.createLayer('clouds'));
 
-    //new Grid(game, map.widthInPixels, map.heightInPixels);
+    if (obj.player.x != null && obj.player.y != null) {
+
+        sprites.push(game.add.sprite(obj.player.x, obj.player.y, 'player'));
+        playerIndex = sprites.length - 1;
+
+    }
+
+    for (var i = 0; i < obj.coins.length; i++) {
+
+        sprites.push(game.add.sprite(obj.coins[i].x, obj.coins[i].y, 'coin'));
+
+    }
 
 }
 

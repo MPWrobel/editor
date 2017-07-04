@@ -4,8 +4,7 @@
 <head>
     <title>editor</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="js/phaser.js"></script>
-    <script src="js/editor.js"></script>
+    <script src="js/phaser.js"></script>    
 </head>
 
 <body>
@@ -15,9 +14,12 @@
         <ul>
             <li onclick="addElement('player')">Player</li>
             <li onclick="addElement('coin')">Coin</li>
+            <li onclick="addElement('enemy')">Enemy</li>
+            <li onclick="addElement('powerup')">Power-up</li>
         </ul>
         <input type="file" id="file-input" accept=".json" onchange="loadFile()">
         <div id="save"></div>
+        <script src="js/editor.js"></script>
     </div>
 </body>
 
